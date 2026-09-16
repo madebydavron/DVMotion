@@ -1,0 +1,598 @@
+/* DVMotion
+   After Effects dark UI palette. */
+
+:root{
+  --app:#141414;        /* gaps between panels */
+  --panel:#232323;      /* panel face */
+  --panel-2:#2b2b2b;    /* raised surface */
+  --field:#1a1a1a;      /* inset fields */
+  --btn:#383838;
+  --btn-hi:#454545;
+  --line:#3a3a3a;
+  --line-dark:#141414;
+
+  --text:#c8c8c8;
+  --text-dim:#8a8a8a;
+  --text-mute:#6b6b6b;
+
+  --accent:#2f8de4;       /* AE selection blue */
+  --accent-solid:#1473e6; /* filled buttons */
+  --btn-line:#7c7c7c;
+  --accent-hi:#4a9de8;
+  --ok:#4a9c6d;
+  --err:#c9524f;
+
+  --radius:2px;
+  --control-h:22px;
+  --card:88px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:var(--panel);
+  color:var(--text);
+  font:11px/1.45 "Segoe UI",-apple-system,"Helvetica Neue",sans-serif;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  user-select:none;
+}
+
+/* ---------- toolbars ---------- */
+
+.bar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 8px;
+  background:var(--panel);
+  flex:0 0 auto;
+}
+.bar--sub{
+  flex-wrap:wrap;
+  row-gap:6px;
+  padding-top:0;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--line-dark);
+  box-shadow:0 1px 0 var(--line);
+}
+
+/* ---------- buttons ----------
+   Matching the button pair in After Effects' own dialogs: a filled blue
+   primary, an outlined secondary, both with a focus ring. */
+
+.seg{
+  height:var(--control-h);
+  min-width:var(--control-h);
+  padding:0 12px;
+  border:1px solid var(--btn-line);
+  border-radius:4px;
+  background:transparent;
+  color:var(--text);
+  font:inherit;
+  cursor:pointer;
+  transition:background .1s ease, border-color .1s ease;
+}
+.seg:hover{
+  background:var(--btn);
+  border-color:var(--text-dim);
+}
+.seg:active{background:#2e2e2e}
+.seg:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+.seg--primary{
+  background:var(--accent-solid);
+  border-color:var(--accent-solid);
+  color:#fff;
+}
+.seg--primary:hover{
+  background:var(--accent);
+  border-color:var(--accent);
+}
+.seg--primary:active{background:#1163c8;border-color:#1163c8}
+
+.seg--icon{
+  padding:0;
+  width:var(--control-h);
+  font-size:12px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ---------- fields ---------- */
+
+#search{
+  flex:1 1 auto;
+  min-width:0;
+  height:var(--control-h);
+  padding:0 7px;
+  background:var(--field);
+  border:1px solid var(--line-dark);
+  border-radius:var(--radius);
+  color:var(--text);
+  font:inherit;
+  outline:none;
+}
+#search::placeholder{color:var(--text-mute)}
+#search:focus{border-color:var(--accent)}
+
+.field{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  color:var(--text-dim);
+  white-space:nowrap;
+}
+.field input{
+  width:50px;
+  height:var(--control-h);
+  padding:0 6px;
+  background:var(--field);
+  border:1px solid var(--line-dark);
+  border-radius:var(--radius);
+  color:var(--accent);
+  font:inherit;
+  font-variant-numeric:tabular-nums;
+  outline:none;
+}
+.field input:focus{border-color:var(--accent);color:var(--text)}
+.field em{font-style:normal;color:var(--text-mute)}
+
+/* ---------- checkbox ---------- */
+
+.check{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--text-dim);
+  cursor:pointer;
+  white-space:nowrap;
+}
+.check:hover{color:var(--text)}
+.check input{
+  appearance:none;
+  -webkit-appearance:none;
+  position:relative;
+  width:12px;
+  height:12px;
+  flex:0 0 12px;
+  border:1px solid #555;
+  border-radius:var(--radius);
+  background:var(--field);
+  cursor:pointer;
+}
+.check input:checked{background:var(--accent);border-color:var(--accent)}
+.check input:checked::after{
+  content:"";
+  position:absolute;
+  left:3px;
+  top:0;
+  width:3px;
+  height:6px;
+  border:solid #fff;
+  border-width:0 2px 2px 0;
+  transform:rotate(43deg);
+}
+.check input:focus-visible{outline:1px solid var(--accent);outline-offset:1px}
+
+/* ---------- grid ---------- */
+
+.grid{
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:8px;
+  background:var(--panel);
+}
+
+/* one block per section, so a whole block can be dragged */
+.sect{
+  border:1px solid transparent;
+  border-radius:var(--radius);
+  padding-bottom:4px;
+}
+.sect.is-dragging{opacity:.4}
+.sect.drop-before{box-shadow:0 -2px 0 var(--accent)}
+.sect.drop-after{box-shadow:0 2px 0 var(--accent)}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(var(--card),1fr));
+  gap:10px 8px;
+  align-content:start;
+  align-items:start;      /* each card keeps its own height */
+}
+.grid::-webkit-scrollbar{width:10px}
+.grid::-webkit-scrollbar-track{background:var(--field)}
+.grid::-webkit-scrollbar-thumb{background:#4a4a4a;border:2px solid var(--field);border-radius:5px}
+.grid::-webkit-scrollbar-thumb:hover{background:#5a5a5a}
+
+.cat{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--text-mute);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:8px 2px 5px;
+  cursor:grab;
+  user-select:none;
+}
+.cat:hover{color:var(--text-dim)}
+.cat:active{cursor:grabbing}
+.sect:first-child .cat{padding-top:2px}
+
+.grip{
+  letter-spacing:-2px;
+  font-size:11px;
+  color:#4f4f4f;
+  transform:translateY(-1px);
+}
+.cat:hover .grip{color:var(--text-dim)}
+
+/* ---------- cards ---------- */
+
+/* Adobe asboblar panelidagi kabi: ramkali ikonka, ostida markazlashgan nom */
+.card{
+  background:transparent;
+  border:0;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Preview never gets cropped — vertical titles fit inside the same box */
+.thumb{
+  width:100%;
+  aspect-ratio:16/10;
+  flex:0 0 auto;
+  background:var(--field);
+  display:block;
+  object-fit:contain;
+  border:1px solid var(--line-dark);
+  border-radius:4px;
+  transition:border-color .1s ease;
+}
+.card:hover .thumb{border-color:#5c5c5c}
+.card.is-sel .thumb{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent);
+}
+.thumb--empty{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#4f4f4f;
+  font-size:16px;
+  font-weight:700;
+}
+.card b{
+  display:block;
+  flex:0 0 auto;
+  padding:5px 2px 0;
+  font-weight:400;
+  font-size:10px;
+  text-align:center;
+  color:var(--text-dim);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.card:hover b{color:var(--text)}
+.card.is-sel b{color:var(--text)}
+
+.thumbwrap{position:relative;overflow:hidden}
+.thumbwrap .media{
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+.thumbwrap .cover{z-index:1;opacity:1;transition:opacity .1s linear}
+
+.empty{
+  grid-column:1/-1;
+  padding:36px 14px;
+  text-align:center;
+  color:var(--text-mute);
+  line-height:1.8;
+}
+.empty b{color:var(--text);font-weight:700}
+
+/* ---------- footer ---------- */
+
+.foot{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:5px 8px;
+  border-top:1px solid var(--line-dark);
+  background:var(--panel);
+  font-size:10px;
+}
+.foot-spacer{flex:1 1 auto}
+.ver{flex:0 0 auto;color:#565656;font-variant-numeric:tabular-nums}
+
+/* ---------- size slider ---------- */
+
+.size{
+  flex:0 0 78px;
+  appearance:none;
+  -webkit-appearance:none;
+  height:12px;
+  background:transparent;
+  outline:none;
+  cursor:pointer;
+}
+.size::-webkit-slider-runnable-track{
+  height:3px;
+  background:var(--field);
+  border:1px solid var(--line-dark);
+  border-radius:2px;
+}
+.size::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  margin-top:-4px;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:#9a9a9a;
+  border:1px solid var(--line-dark);
+}
+.size:hover::-webkit-slider-thumb{background:var(--accent)}
+
+/* ---------- toast ----------
+   Spectrum Toast, scaled to this panel's 11px type.
+   Structure: icon, body, divider, close button. One at a time. */
+
+.toasts{
+  position:fixed;
+  left:50%;
+  bottom:34px;
+  transform:translateX(-50%);
+  z-index:50;
+  pointer-events:none;
+  max-width:calc(100% - 16px);
+}
+.toast{
+  pointer-events:auto;
+  display:flex;
+  align-items:center;
+  min-height:32px;
+  max-width:320px;
+  padding:5px 5px 5px 12px;
+  border-radius:4px;
+  color:#fff;
+  font-size:11px;
+  line-height:1.45;
+  box-shadow:0 4px 12px rgba(0,0,0,.55);
+  animation:toast-in .13s ease-out;
+}
+.toast.is-out{animation:toast-out .16s ease-in forwards}
+
+/* Spectrum semantic variants */
+.toast--ok{background:#0d7d4d}
+.toast--err{background:#c9252d}
+.toast--info{background:#4b4b4b}
+
+.toast-icon{
+  width:14px;
+  height:14px;
+  flex:0 0 14px;
+  margin-right:9px;
+}
+.toast-text{
+  flex:1 1 auto;
+  min-width:0;
+  padding-right:10px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.toast-sep{
+  flex:0 0 1px;
+  width:1px;
+  align-self:stretch;
+  margin:3px 0;
+  background:rgba(255,255,255,.25);
+}
+.toast-close{
+  flex:0 0 auto;
+  width:22px;
+  height:22px;
+  margin-left:3px;
+  border:0;
+  border-radius:3px;
+  background:transparent;
+  color:#fff;
+  font-size:10px;
+  line-height:1;
+  cursor:pointer;
+}
+.toast-close:hover{background:rgba(255,255,255,.15)}
+.toast-close:active{background:rgba(255,255,255,.25)}
+.toast-close:focus-visible{outline:1px solid #fff;outline-offset:-2px}
+
+@keyframes toast-in{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+@keyframes toast-out{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateY(4px)}
+}
+
+/* ---------- settings panel ---------- */
+
+/* Settings and the log cover the grid rather than splitting the panel in two.
+   Only one is ever open. */
+.stage{
+  position:relative;
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+}
+
+.panel{
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  z-index:5;
+  overflow-y:auto;
+  padding:10px 12px 14px;
+  background:var(--panel);
+}
+.panel h2{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-mute);
+  margin-bottom:4px;
+}
+.panel .hint{
+  color:var(--text-mute);
+  margin-bottom:9px;
+  line-height:1.5;
+}
+.panel .row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:5px;
+}
+.panel .row span{
+  flex:0 0 62px;
+  color:var(--text-dim);
+}
+.panel .row input{
+  flex:1 1 auto;
+  min-width:0;
+  height:var(--control-h);
+  padding:0 7px;
+  background:var(--field);
+  border:1px solid var(--line-dark);
+  border-radius:var(--radius);
+  color:var(--text);
+  font:inherit;
+  outline:none;
+}
+.panel .row input:focus{border-color:var(--accent)}
+.panel-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+/* ---------- log view ---------- */
+
+.log{
+  margin-top:8px;
+  max-height:calc(100vh - 220px);
+  min-height:120px;
+  overflow:auto;
+  padding:8px;
+  background:var(--field);
+  border:1px solid var(--line-dark);
+  border-radius:var(--radius);
+  color:var(--text-dim);
+  font:10px/1.55 Consolas, "Courier New", monospace;
+  white-space:pre-wrap;
+  word-break:break-all;
+  user-select:text;
+}
+.log::-webkit-scrollbar{width:9px}
+.log::-webkit-scrollbar-thumb{background:#4a4a4a;border-radius:5px}
+.log:empty::before{content:"render.log is empty.";color:var(--text-mute)}
+
+/* ---------- progress bar ---------- */
+
+.prog{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1 1 auto;
+  min-width:0;
+}
+.prog-label{
+  flex:0 1 auto;
+  min-width:0;
+  color:var(--text-dim);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.prog-track{
+  flex:1 1 auto;
+  min-width:40px;
+  max-width:180px;
+  height:4px;
+  background:var(--field);
+  border:1px solid var(--line-dark);
+  border-radius:2px;
+  overflow:hidden;
+}
+.prog-fill{
+  display:block;
+  height:100%;
+  width:0%;
+  background:var(--accent-solid);
+  transition:width .2s linear;
+}
+
+.mt-state{
+  align-self:center;
+  color:var(--text-mute);
+  font-size:10px;
+}
+.mt-state.ok{color:var(--ok)}
+.mt-state.err{color:var(--err)}
+
+.panel::-webkit-scrollbar{width:10px}
+.panel::-webkit-scrollbar-track{background:transparent}
+.panel::-webkit-scrollbar-thumb{background:#4a4a4a;border:2px solid var(--panel);border-radius:5px}
+
+/* ---------- log colouring ---------- */
+
+.log .t{color:#5a5a5a}                    /* timestamp */
+.log .l-err{color:#e0706d}
+.log .l-ok{color:#63b98a}
+.log .l-warn{color:#d9a441}
+.log .l-head{color:var(--accent);font-weight:700}
+.log .l-cmd{color:#8fa9c4}
+.log-line{display:block}
+
+/* ---------- pill button (After Effects' Render / Queue in AME) ---------- */
+
+.seg--pill{
+  height:26px;
+  padding:0 14px 0 11px;
+  border-radius:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  letter-spacing:.01em;
+}
+.seg--pill .ico{
+  font-size:9px;
+  line-height:1;
+  transform:translateY(0.5px);
+}
+
+/* Emoji are square by nature - a shared shape reads as a set */
+.card--emoji .thumb{aspect-ratio:1/1}

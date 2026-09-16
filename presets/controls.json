@@ -1,0 +1,8 @@
+{
+  "*": {
+    "Bounce Freq": 2,
+    "Bounce Amplitude": 50,
+    "Bounce Decay": 6,
+    "Out Duration": 0.6
+  }
+}

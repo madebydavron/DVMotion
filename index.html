@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DVMotion</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="bar">
+    <input id="search" type="text" placeholder="Search…" spellcheck="false">
+    <button id="markBtn" class="seg seg--icon" title="Add IN / OUT markers to the selected layers">&#9873;</button>
+    <button id="refresh" class="seg seg--icon" title="Re-read the folders and release a stuck undo group">&#8635;</button>
+    <button id="renderBtn" class="seg seg--pill seg--primary" title="Render the active composition and send it to Telegram"><span class="ico">&#9654;</span>Render</button>
+    <button id="gear" class="seg seg--icon" title="Settings">&#9881;</button>
+  </header>
+
+  <div class="bar bar--sub">
+    <label class="field" title="How long the animation runs. Decides where the OUT keyframes start.">
+      <span>Duration</span>
+      <input id="dur" type="number" min="0.1" step="0.1" value="1">
+      <em>s</em>
+    </label>
+    <label class="field" title="How far below centre the CTA sits">
+      <span>CTA offset</span>
+      <input id="ctaY" type="number" step="10" value="200">
+      <em>px</em>
+    </label>
+    <label class="check" title="Use the duration stored with the preset instead of the field above">
+      <input id="useLayerDur" type="checkbox">
+      <span>Preset duration</span>
+    </label>
+    <label class="check" title="Marker-driven expressions need these. A .ffx file cannot store markers.">
+      <input id="markers" type="checkbox" checked>
+      <span>Add IN / OUT markers</span>
+    </label>
+    <label class="check" title="A text anim carries its own words, so each insert gets its own copy and the two can say different things. Emoji have no text and are never copied.">
+      <input id="dupe" type="checkbox" checked>
+      <span>Copy text anims on insert</span>
+    </label>
+    <label class="check" title="Off (recommended): the composition goes in as a single precomp layer, nothing is copied. On: its layers are pasted into the timeline instead.">
+      <input id="unpack" type="checkbox">
+      <span>Unpack into layers</span>
+    </label>
+  </div>
+
+  <div class="stage">
+
+  <main id="grid" class="grid"></main>
+
+
+  <section class="panel" id="settings" hidden>
+    <h2>Match the project</h2>
+    <label class="check" title="Sets the title's frame rate, and that of every precomp inside it, to the frame rate of the composition you are inserting into">
+      <input id="mFps" type="checkbox" checked>
+      <span>Match frame rate</span>
+    </label>
+    <label class="check" title="Scales the inserted layer so a 1080 title fits a 4K comp and the other way round">
+      <input id="mSize" type="checkbox" checked>
+      <span>Scale to project size</span>
+    </label>
+    <label class="check" title="Keeps shapes and text sharp when scaled up. Turn off if effects inside the title render differently.">
+      <input id="mCollapse" type="checkbox" checked>
+      <span>Collapse transformations when scaled</span>
+    </label>
+
+    <h2>Render &amp; Telegram</h2>
+    <p class="hint">Rendering runs in aerender, so After Effects stays usable and the
+       progress percentage is real. Bots can upload up to 50 MB.</p>
+
+    <label class="row"><span>Bot token</span><input id="tgToken" type="password" placeholder="123456:ABC-DEF..."></label>
+    <label class="row"><span>Chat ID</span><input id="tgChat" type="text" placeholder="-1001234567890"></label>
+    <label class="row"><span>Output module</span><input id="omTpl" type="text" placeholder="H.264 - Match Render Settings - 15 Mbps"></label>
+    <label class="row"><span>Render settings</span><input id="rsTpl" type="text" placeholder="Best Settings"></label>
+    <label class="row"><span>Output folder</span><input id="outDir" type="text" placeholder="leave empty for <project>/renders"></label>
+
+    <label class="check" title="If the render is over the limit, re-encode it with ffmpeg at a bitrate that fits, then send that">
+      <input id="fitSize" type="checkbox" checked>
+      <span>Compress to fit the limit</span>
+    </label>
+
+    <h2>Send with your own account</h2>
+    <p class="hint">A bot is capped at 50 MB by Telegram. Your own account may upload
+       2 GB. This signs in as you — the session is stored in settings.json in plain
+       text and is full access to your account, so treat that file like a password.</p>
+
+    <label class="check" title="Upload through your account instead of the bot">
+      <input id="useAccount" type="checkbox">
+      <span>Upload with my account (2 GB)</span>
+    </label>
+
+    <label class="row"><span>Phone</span><input id="mtPhone" type="text" placeholder="+998901234567"></label>
+    <label class="row"><span>Code</span><input id="mtCode" type="text" placeholder="sent by Telegram"></label>
+    <label class="row"><span>2FA password</span><input id="mtPass" type="password" placeholder="only if you set one"></label>
+    <label class="row"><span>Send to</span><input id="mtTarget" type="text" placeholder="me, @username, or a chat id"></label>
+
+    <div class="panel-actions">
+      <button id="mtSendCode" class="seg">Send code</button>
+      <button id="mtSignIn" class="seg seg--primary">Sign in</button>
+      <span class="mt-state" id="mtState"></span>
+    </div>
+
+    <p class="hint">A bot on Telegram's own servers may upload 50 MB. Running your own
+       Bot API server raises that to 2 GB. The api_id and api_hash are what that
+       server needs to start — entering them here changes nothing on its own.
+       Fill in <b>API server</b> with the address it listens on, e.g.
+       <b>http://localhost:8081</b>.</p>
+
+    <label class="row"><span>API server</span><input id="apiBase" type="text" placeholder="https://api.telegram.org"></label>
+    <label class="row"><span>api_id</span><input id="apiId" type="text" placeholder="only for your own server"></label>
+    <label class="row"><span>api_hash</span><input id="apiHash" type="password" placeholder="only for your own server"></label>
+
+    <div class="panel-actions">
+      <button id="saveCfg" class="seg seg--primary">Save</button>
+      <button id="testTg" class="seg" title="Send one message to check the token and chat ID">Test Telegram</button>
+      <button id="tidyBtn" class="seg" title="Collect anything imported earlier into the By Davron project folder">Tidy project</button>
+      <button id="scanBtn" class="seg" title="Force a re-read, e.g. after adding a composition to a bundle">Rescan bundles</button>
+      <button id="closeCfg" class="seg">Close</button>
+    </div>
+
+  </section>
+
+  <section class="panel" id="logPanel" hidden>
+    <h2>render.log</h2>
+    <pre id="logView" class="log"></pre>
+    <div class="panel-actions">
+      <button id="logRefresh" class="seg">Refresh</button>
+      <button id="logClear" class="seg">Clear</button>
+      <button id="sendLog" class="seg" title="Upload render.log to the chat">Send log</button>
+      <button id="closeLog" class="seg">Close</button>
+    </div>
+  </section>
+
+  </div>
+
+  <footer class="foot">
+    <div class="prog" id="prog" hidden>
+      <span class="prog-label" id="progLabel"></span>
+      <span class="prog-track"><span class="prog-fill" id="progFill"></span></span>
+    </div>
+    <span class="foot-spacer"></span>
+    <button id="logBtn" class="seg seg--icon" title="Show render.log">&#9776;</button>
+    <input id="size" class="size" type="range" min="60" max="220" step="4" value="88"
+           title="Thumbnail size">
+    <span class="ver" id="ver"></span>
+  </footer>
+
+  <div class="toasts" id="toasts"></div>
+
+  <script src="js/mtproto.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
