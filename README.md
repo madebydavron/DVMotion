@@ -1,5 +1,13 @@
 # DVMotion
 
+DVMotion — a motion graphics tool by MadeByDavron.
+
+Created by MadeByDavron:
+https://github.com/madebydavron
+
+GitHub:
+https://github.com/madebydavron/dvmotion
+
 **Version 1.56.0**
 
 An After Effects extension for text animation presets, title compositions, CTA clips and more.
